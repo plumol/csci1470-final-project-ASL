@@ -46,9 +46,9 @@ def compile_model(model):
     '''Compiles model by reference based on arguments'''
     # optimizer = tf.keras.optimizers.get(args.optimizer).__class__(learning_rate = args.lr)
     model.compile(
-        optimizer   = 'sgd', # play around wit this
-        loss        = tfr.keras.losses.SoftmaxLoss(), # reduce mean?
-        metrics     = ['categorical_accuracy'] # not sure if cat crossentropy is what we want lol
+        optimizer   = model.optimizer, # play around with this
+        loss        = model.loss_function, # reduce mean?
+        metrics     = [model.acc_function] # not sure if cat crossentropy is what we want lol
     )
 
 def test_model(model, captions, img_feats, pad_idx, args):
