@@ -24,3 +24,10 @@ class ASLClassifier(tf.keras.Model):
 
 
     def call(self, x):
+        return self.layers(x)
+
+    def compile():
+    
+    def train():
+
+    def test():
