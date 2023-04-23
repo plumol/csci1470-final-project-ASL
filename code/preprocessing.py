@@ -10,17 +10,30 @@ import pathlib
 
 train_dir = r"data/handgesturedataset_part1"
 
-# TODO: load the dataset into arrays
 
-# TODO: preprocess the images into a standard size and change to grayscale
+def preprocess(file_path):
+    input_images = []
+    # For showing images.
+    pil = []
+    # Gets 0 through 36, repeats each of them 25x. 
+    labels = np.repeat(np.arange(36), 25) 
+    # Output of length 25.
+    labels = tf.one_hot(labels, 36) 
 
-# TODO: shuffle the arrays for training and test split
-
-
-def preprocess2(file_path):
     for image in os.listdir(file_path):
-        loaded_image = tf.keras.preprocessing.image.load_img(file_path + "/" + image)
-        print(loaded_image)
+        loaded_image = tf.keras.preprocessing.image.load_img(file_path + "/" + image, target_size=(28, 28), grayscale=True)
+        pil.append(loaded_image)
+        loaded_image = tf.keras.preprocessing.image.img_to_array(loaded_image) / 255.
+        input_images.append(loaded_image)
 
-#preprocess(train_dir)
-img_dict = preprocess2(train_dir)
+    # indices = [x for x in range(len(images))]
+    # indices = tf.random.shuffle(indices)
+    # images = tf.gather(images, indices)
+    # labels = tf.gather(labels, indices)
+
+    return input_images, pil, labels
+
+
+imgs, pils, labels = preprocess(train_dir)
+
+# pils[<index>].show()
