@@ -56,10 +56,11 @@ def split_train_test(input_images, input_labels, train_split = .80):
     test_labels = []
     
     # splits processed data set into respective collections of signs: 25 images for each of 36 signs
+    # So we have 36 sublists of 25 images
     split_input_images = np.array_split(ary=input_images, indices_or_sections=36)
     split_input_labels = np.array_split(ary=input_labels, indices_or_sections=36)
 
-    # shuffle each image:label collection
+    # shuffle each image:label collection, similar to how we shuffled the training data
     indices = [x for x in range(len(split_input_images[0]))]
     indices = tf.random.shuffle(indices)
 
@@ -89,11 +90,14 @@ def split_train_test(input_images, input_labels, train_split = .80):
     test_images = np.concatenate(test_images)
     test_labels = np.concatenate(test_labels)
 
-
     return train_images, train_labels, test_images, test_labels
 
 def label_name_dict():
-    # lazy 
+    """
+    Instead of using the numbers we generated for the labels, we can have a dictionary that interprets the 
+    predicted label into the corresponding sign. 
+    """
+    # lazy- I didn't want to write out each dict entry 
     nums_alpha = np.arange(0, 10)
     nums_alpha = np.concatenate([nums_alpha, list(string.ascii_lowercase)])
     
@@ -102,7 +106,6 @@ def label_name_dict():
     for i in range(36):
         label_name[i] = nums_alpha[i]
 
-    #print(label_name)
     return label_name
 
 

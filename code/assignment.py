@@ -127,10 +127,12 @@ def visualize_results(image_inputs, probabilities, image_labels, first_label, se
     plt.show()
 
 def visualize_inputs(train_images, train_labels, label_names):
-    
+
     #plt.figure(figsize=(10, 10))
 
     pass
+
+
 
 def main(args):
     train_dir = r"data/handgesturedataset_part1"
@@ -148,7 +150,15 @@ def main(args):
     test_loss, test_accuracy = test_model(model=asl_model, test_inputs=test_images, test_labels=test_labels)
     print(f"Testing loss: {test_loss}, \t Testing acc: {test_accuracy}")
 
-    visualize_results(test_images[0:50], asl_model.call(test_images), test_labels[0:50], 4, 1)
+    prediction = asl_model.predict(test_images[:])
+
+    num_list = [np.argmax(i) for i in prediction]
+    print(prediction)
+    print(num_list)
+    pred_list = [label_name[i] for i in num_list]
+    print(pred_list)
+
+    # visualize_results(test_images[0:50], asl_model.call(test_images), test_labels[0:50], 4, 1)
     pass
 
 if __name__ == '__main__':
