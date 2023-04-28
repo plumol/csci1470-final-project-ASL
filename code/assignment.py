@@ -1,3 +1,5 @@
+import random
+import numpy as np
 import tensorflow as tf
 import tensorflow_ranking as tfr
 import argparse
@@ -17,19 +19,33 @@ def parse_args(args=None):
         return parser.parse_args()      ## For calling through command line
     return parser.parse_args(args)      ## For calling through notebook.
 
-def train_classifier(model):
+def train_classifier(model, train_inputs, train_labels): # is this the right approach??
     """
     Train your classifier with one epoch
 
     Returns:
     loss? accuracy?
     """
-    total_loss = 0
+    # copied from hw3?
+    zipped = list(zip(train_inputs, train_labels))
+    random.shuffle(zipped)
+    inputs = np.array([tf.image.random_flip_left_right(tup[0]) for tup in zipped])
+    labels = np.array([tup[1] for tup in zipped])
+ 
+    for i in range(0, len(zipped), model.batch_size):
+        with tf.GradientTape() as tape:
+            logits = model.call(inputs[i:i + model.batch_size], False)
+            loss = model.loss(logits, labels[i:i + model.batch_size])
+
+        model.loss_list.append(loss)
+        grads = tape.gradient(loss, model.trainable_variables) # calculates gradients
+        model.optimizer.apply_gradients(zip(grads, model.trainable_variables)) # updates trainable vars
+    # total_loss = 0
     # optimizer = tf.optimizers.Adam(model.learning_rate)
     # '''Trains model and returns model statistics'''
     # stats = []
     # try:
-    #     for epoch in range(args.epochs):
+    #     for epoch in range(model.epochs):
     #         stats += [model.train(captions, img_feats, pad_idx, batch_size=args.batch_size)]
     #         if args.check_valid:
     #             model.test(valid[0], valid[1], pad_idx, batch_size=args.batch_size)

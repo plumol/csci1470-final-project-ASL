@@ -23,7 +23,7 @@ class ASLClassifier(tf.keras.Model):
             tf.keras.layers.MaxPool2D(strides=(2,2)),
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(128, activation="relu"),
-            tf.keras.layers.Dense(36)
+            tf.keras.layers.Dense(36) # number of classes/hand signs
         ])
 
 
@@ -31,6 +31,7 @@ class ASLClassifier(tf.keras.Model):
         return self.layers(x)
     
     def train(self):
+        #TODO add accuracy
         total_loss = 0
         for _ in self.num_epochs:
 
@@ -48,3 +49,6 @@ class ASLClassifier(tf.keras.Model):
 
     def test():
         # should be similar to training
+        #HW3:
+        # logits = model.call(test_inputs, True)
+        # return model.accuracy(logits, test_labels)
