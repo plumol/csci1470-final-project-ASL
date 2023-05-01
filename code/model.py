@@ -45,8 +45,8 @@ class ASLClassifier(tf.keras.Model):
             with tf.GradientTape() as tape:
                 pred_labels = self.call(train_inputs[b0:b1])
 
-                loss = self.loss_function(pred_labels, train_labels[b0:b1])
-                acc = self.acc_function(pred_labels, train_labels[b0:b1])
+                loss = loss_function(pred_labels, train_labels[b0:b1])
+                acc = acc_function(pred_labels, train_labels[b0:b1])
             
             grads = tape.gradient(loss, self.trainable_weights)
             self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
@@ -71,8 +71,8 @@ class ASLClassifier(tf.keras.Model):
             ## Perform a no-training forward pass. Make sure to factor out irrelevant labels.
             
             probs = self.call(test_inputs[b0:b1])
-            loss = self.loss_function(probs, test_labels[b0:b1])
-            acc = self.acc_function(probs, test_labels[b0:b1])
+            loss = loss_function(probs, test_labels[b0:b1])
+            acc = acc_function(probs, test_labels[b0:b1])
 
             total_loss.append(loss)
             total_acc.append(acc)
@@ -81,9 +81,9 @@ class ASLClassifier(tf.keras.Model):
         return tf.reduce_mean(total_loss), tf.reduce_mean(total_acc)
         pass
 
-    def loss_function(self, logits, labels):
-        return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels, logits))
+def loss_function(logits, labels):
+    return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels, logits))
 
-    def acc_function(self, logits, labels):
-        correct_predictions = tf.equal(tf.argmax(logits, 1), tf.argmax(labels, 1))
-        return tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
+def acc_function(logits, labels):
+    correct_predictions = tf.equal(tf.argmax(logits, 1), tf.argmax(labels, 1))
+    return tf.reduce_mean(tf.cast(correct_predictions, tf.float32))

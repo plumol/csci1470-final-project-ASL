@@ -3,10 +3,12 @@ import numpy as np
 import tensorflow as tf
 import argparse
 from model import ASLClassifier as model
+from model import loss_function, acc_function 
 from preprocessing import preprocess, split_train_test, label_name_dict
 import matplotlib.pyplot as plt
 import math
 
+label_name = label_name_dict()
 
 def parse_args(args=None):
     """ 
@@ -62,14 +64,27 @@ def compile_model(model):
     # optimizer = tf.keras.optimizers.get(args.optimizer).__class__(learning_rate = args.lr)
     model.compile(
         optimizer   = tf.keras.optimizers.Adam(learning_rate = 0.001), # play around with this
-        loss        = model.loss_function, # reduce mean?
-        metrics     = [model.acc_function] # not sure if cat crossentropy is what we want lol
+        loss        = loss_function, # reduce mean?
+        metrics     = [acc_function] # not sure if cat crossentropy is what we want lol
     )
 
 def test_model(model, test_inputs, test_labels):
     '''Tests model and returns model statistics'''
     loss, accuracy = model.test(test_inputs, test_labels)
     return loss, accuracy
+
+def save_model(model):
+    tf.keras.models.save_model(model, r"model")
+    print(f"Model saved to /model")
+
+def load_model(model_path):
+    loaded_model = tf.keras.models.load_model(model_path,
+                                       custom_objects = dict(
+                                           loss_function = loss_function,
+                                           acc_function = acc_function
+                                        ))
+    compile_model(loaded_model)
+    return loaded_model
 
 
 #to visualize, set up a dictionary for all of the generated labels, pull from that
@@ -132,14 +147,26 @@ def visualize_inputs(train_images, train_labels, label_names):
 
     pass
 
+def show_incorrect_predictions(prediction, test_labels):
+    num_list = [np.argmax(i) for i in prediction]
+    pred_list = [label_name[i] for i in num_list]
 
+    incorrect_list = []
+    for i, j in zip(enumerate(pred_list), test_labels):
+        if i[1] != label_name[np.argmax(j)]:
+            incorrect_list.append((i[0], label_name[np.argmax(j)]))
+
+    
+    for pred in incorrect_list:
+        incorrect = pred_list[pred[0]]
+        print(f"Pred: {incorrect}, when actual: {pred[1]}")
 
 def main(args):
     train_dir = r"data/handgesturedataset_part1"
     imgs, pils, labels = preprocess(train_dir)
     train_images, train_labels, test_images, test_labels = split_train_test(input_images=imgs, input_labels=labels)
     
-    label_name = label_name_dict()
+    
     visualize_inputs(train_images=train_images, train_labels=train_labels, label_names=label_name)
     
     
@@ -151,12 +178,10 @@ def main(args):
     print(f"Testing loss: {test_loss}, \t Testing acc: {test_accuracy}")
 
     prediction = asl_model.predict(test_images[:])
+    save_model(asl_model)
 
-    num_list = [np.argmax(i) for i in prediction]
-    print(prediction)
-    print(num_list)
-    pred_list = [label_name[i] for i in num_list]
-    print(pred_list)
+    show_incorrect_predictions(prediction=prediction, test_labels=test_labels)
+    
 
     # visualize_results(test_images[0:50], asl_model.call(test_images), test_labels[0:50], 4, 1)
     pass
