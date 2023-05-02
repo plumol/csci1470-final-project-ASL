@@ -4,6 +4,7 @@ import tensorflow as tf
 import argparse
 from model import ASLClassifier as model
 from model import loss_function, acc_function 
+from realtime import run_real_time
 from preprocessing import preprocess, split_train_test, label_name_dict
 import matplotlib.pyplot as plt
 import math
@@ -169,20 +170,17 @@ def main(args):
     
     visualize_inputs(train_images=train_images, train_labels=train_labels, label_names=label_name)
     
-    
     asl_model = model()
     compile_model(asl_model)
     train_classifier(model=asl_model, train_inputs=train_images, train_labels=train_labels)
     
     test_loss, test_accuracy = test_model(model=asl_model, test_inputs=test_images, test_labels=test_labels)
     print(f"Testing loss: {test_loss}, \t Testing acc: {test_accuracy}")
+    run_real_time(asl_model, label_name)
 
-    prediction = asl_model.predict(test_images[:])
-    save_model(asl_model)
-
-    show_incorrect_predictions(prediction=prediction, test_labels=test_labels)
-    
-
+    # prediction = asl_model.predict(test_images[:])
+    # save_model(asl_model)
+    # show_incorrect_predictions(prediction=prediction, test_labels=test_labels)
     # visualize_results(test_images[0:50], asl_model.call(test_images), test_labels[0:50], 4, 1)
     pass
 
