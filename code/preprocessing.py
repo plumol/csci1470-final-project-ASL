@@ -38,7 +38,9 @@ def preprocess(file_path):
     for image in os.listdir(file_path):
         loaded_image = tf.keras.preprocessing.image.load_img(file_path + "/" + image, target_size=(28, 28), grayscale=True)
         pil.append(loaded_image)
-        loaded_image = tf.keras.preprocessing.image.img_to_array(loaded_image) / 255.
+        loaded_image = tf.keras.preprocessing.image.img_to_array(loaded_image)
+        loaded_image[loaded_image == 0] = 220
+        loaded_image = loaded_image / 255.
         input_images.append(loaded_image)
 
     # indices = [x for x in range(len(images))]

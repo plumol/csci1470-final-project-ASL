@@ -5,6 +5,7 @@ import argparse
 from model import ASLClassifier as model
 from model import loss_function, acc_function 
 from realtime import run_real_time
+from real_time import run_rt
 from preprocessing import preprocess, split_train_test, label_name_dict
 import matplotlib.pyplot as plt
 import math
@@ -176,7 +177,8 @@ def main(args):
     
     test_loss, test_accuracy = test_model(model=asl_model, test_inputs=test_images, test_labels=test_labels)
     print(f"Testing loss: {test_loss}, \t Testing acc: {test_accuracy}")
-    run_real_time(asl_model, label_name)
+    # run_real_time(asl_model, label_name)
+    run_rt(asl_model, label_name)
 
     # prediction = asl_model.predict(test_images[:])
     # save_model(asl_model)
