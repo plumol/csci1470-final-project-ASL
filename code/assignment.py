@@ -2,6 +2,8 @@ import numpy as np
 import tensorflow as tf
 from model import ASLClassifier as model
 from model import loss_function, acc_function 
+from contour_real_time import run_contour_real_time
+from hand_detector_real_time import run_hd_real_time
 from preprocessing import preprocess, split_train_test, label_name_dict
 
 label_name = label_name_dict()
@@ -25,7 +27,8 @@ def compile_model(model):
     )
 
 def test_model(model, test_inputs, test_labels):
-    '''Tests model and returns model statistics'''
+    '''Tests model and returns model statistics
+    Returns: loss and accuracy metrics'''
     loss, accuracy = model.test(test_inputs, test_labels)
     return loss, accuracy
 
@@ -68,6 +71,9 @@ def main():
     
     test_loss, test_accuracy = test_model(model=asl_model, test_inputs=test_images, test_labels=test_labels)
     print(f"Testing loss: {test_loss}, \t Testing acc: {test_accuracy}")
+    # Uncomment the line below if you want to try the contour-based hand detection
+    # run_contour_real_time(asl_model, label_name)
+    run_hd_real_time(asl_model, label_name)
 
     prediction = asl_model.predict(test_images[:])
     save_model(asl_model)

@@ -35,16 +35,17 @@ def preprocess(file_path):
     labels = tf.one_hot(labels, 36) 
 
     for image in os.listdir(file_path):
+        # Convert to grayscale and resize to 28x28
         loaded_image = tf.keras.preprocessing.image.load_img(file_path + "/" + image, target_size=(28, 28), grayscale=True)
         pil.append(loaded_image)
-        loaded_image = tf.keras.preprocessing.image.img_to_array(loaded_image) / 255.
+        loaded_image = tf.keras.preprocessing.image.img_to_array(loaded_image)
+        # Normalize
+        loaded_image = loaded_image / 255.
         input_images.append(loaded_image)
-
 
     return input_images, pil, labels
 
 def split_train_test(input_images, input_labels, train_split = .80):
-    # TODO: find a way to do an efficient train test split, since our labeled data is in order, we need to split some of the labeled images
     train_images = []
     train_labels = []
     test_images = []
@@ -109,5 +110,4 @@ imgs, pils, labels = preprocess(train_dir)
 split_train_test(imgs, labels)
 
 label_name_dict()
-# pils[<index>].show()
 

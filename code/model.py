@@ -52,7 +52,6 @@ class ASLClassifier(tf.keras.Model):
         return tf.reduce_mean(total_loss), tf.reduce_mean(total_acc)
 
     def test(self, test_inputs, test_labels):
-
         total_loss = []
         total_acc = []
         for b, b1 in enumerate(range(self.batch_size, len(test_labels)+1, self.batch_size)):
