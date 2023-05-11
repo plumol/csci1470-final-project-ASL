@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import os
 import tensorflow as tf
-import pathlib
 import string
 
 
@@ -41,10 +40,6 @@ def preprocess(file_path):
         loaded_image = tf.keras.preprocessing.image.img_to_array(loaded_image) / 255.
         input_images.append(loaded_image)
 
-    # indices = [x for x in range(len(images))]
-    # indices = tf.random.shuffle(indices)
-    # images = tf.gather(images, indices)
-    # labels = tf.gather(labels, indices)
 
     return input_images, pil, labels
 
@@ -64,6 +59,7 @@ def split_train_test(input_images, input_labels, train_split = .80):
     indices = [x for x in range(len(split_input_images[0]))]
     indices = tf.random.shuffle(indices)
 
+    # gather the shuffled iamges and indices 
     for i in range(len(split_input_images)):
         split_input_images[i] = tf.gather(split_input_images[i], indices)
         split_input_labels[i] = tf.gather(split_input_labels[i], indices)
@@ -97,7 +93,7 @@ def label_name_dict():
     Instead of using the numbers we generated for the labels, we can have a dictionary that interprets the 
     predicted label into the corresponding sign. 
     """
-    # lazy- I didn't want to write out each dict entry 
+    # lazy- I didn't want to write out each dict entry for the labels, so I automated it
     nums_alpha = np.arange(0, 10)
     nums_alpha = np.concatenate([nums_alpha, list(string.ascii_lowercase)])
     
@@ -110,9 +106,6 @@ def label_name_dict():
 
 
 imgs, pils, labels = preprocess(train_dir)
-#print(len(imgs))
-#for i in imgs:
-#    print(len(i))
 split_train_test(imgs, labels)
 
 label_name_dict()

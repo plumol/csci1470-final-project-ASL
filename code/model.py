@@ -1,9 +1,5 @@
-import numpy as np
-import math
 import tensorflow as tf
-from keras.layers import \
-    Conv2D, MaxPool2D, Dropout, Flatten, Dense
-import sklearn
+
 
 class ASLClassifier(tf.keras.Model):
     def __init__(self):
@@ -11,10 +7,6 @@ class ASLClassifier(tf.keras.Model):
         self.num_epochs = 20
         self.num_classes = 36
         self.batch_size = 120
-        self.learning_rate = 0.01
-        #self.loss_function = tfr.keras.losses.SoftmaxLoss()
-        #self.acc_function = tf.keras.metrics.CategoricalCrossentropy()
-        self.optimizer = tf.keras.optimizers.Adam(self.learning_rate)
 
         self.classify = tf.keras.Sequential([
             tf.keras.layers.Conv2D(32, (3,3)),
@@ -29,14 +21,16 @@ class ASLClassifier(tf.keras.Model):
     def call(self, x):
         return self.classify(x)
     
-    def train(self, train_inputs, train_labels, isTesting = False):
-        #TODO add accuracy
+    def train(self, train_inputs, train_labels):
+        """
+        Training the model for one iteration
+        """
 
+        # shuffling training inputs to avoid reproducing the same thing
         indices = [x for x in range(len(train_inputs))]
         indices = tf.random.shuffle(indices)
         train_inputs = tf.gather(train_inputs, indices)
         train_labels = tf.gather(train_labels, indices)
-
 
         total_loss = []
         total_acc = []
@@ -58,10 +52,6 @@ class ASLClassifier(tf.keras.Model):
         return tf.reduce_mean(total_loss), tf.reduce_mean(total_acc)
 
     def test(self, test_inputs, test_labels):
-        # should be similar to training
-        #HW3:
-        # logits = model.call(test_inputs, True)
-        # return model.accuracy(logits, test_labels)
 
         total_loss = []
         total_acc = []
@@ -79,7 +69,7 @@ class ASLClassifier(tf.keras.Model):
 
 
         return tf.reduce_mean(total_loss), tf.reduce_mean(total_acc)
-        pass
+        
 
 def loss_function(logits, labels):
     return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels, logits))
