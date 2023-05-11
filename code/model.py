@@ -12,8 +12,6 @@ class ASLClassifier(tf.keras.Model):
         self.num_classes = 36
         self.batch_size = 120
         self.learning_rate = 0.01
-        #self.loss_function = tfr.keras.losses.SoftmaxLoss()
-        #self.acc_function = tf.keras.metrics.CategoricalCrossentropy()
         self.optimizer = tf.keras.optimizers.Adam(self.learning_rate)
 
         self.classify = tf.keras.Sequential([
@@ -30,8 +28,6 @@ class ASLClassifier(tf.keras.Model):
         return self.classify(x)
     
     def train(self, train_inputs, train_labels, isTesting = False):
-        #TODO add accuracy
-
         indices = [x for x in range(len(train_inputs))]
         indices = tf.random.shuffle(indices)
         train_inputs = tf.gather(train_inputs, indices)
@@ -58,11 +54,6 @@ class ASLClassifier(tf.keras.Model):
         return tf.reduce_mean(total_loss), tf.reduce_mean(total_acc)
 
     def test(self, test_inputs, test_labels):
-        # should be similar to training
-        #HW3:
-        # logits = model.call(test_inputs, True)
-        # return model.accuracy(logits, test_labels)
-
         total_loss = []
         total_acc = []
         for b, b1 in enumerate(range(self.batch_size, len(test_labels)+1, self.batch_size)):

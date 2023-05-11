@@ -76,7 +76,7 @@ def cnn(img):
 
 
 
-def run_real_time(model, labels):
+def run_contour_real_time(model, labels):
     vid = cv2.VideoCapture(0)
 
     while(True):
@@ -104,5 +104,3 @@ def run_real_time(model, labels):
 
     vid.release()
     cv2.destroyAllWindows()
-
-# run_real_time(None)

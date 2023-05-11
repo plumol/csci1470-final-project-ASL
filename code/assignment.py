@@ -4,8 +4,8 @@ import tensorflow as tf
 import argparse
 from model import ASLClassifier as model
 from model import loss_function, acc_function 
-from realtime import run_real_time
-from real_time import run_rt
+from contour_real_time import run_contour_real_time
+from hand_detector_real_time import run_hd_real_time
 from preprocessing import preprocess, split_train_test, label_name_dict
 import matplotlib.pyplot as plt
 import math
@@ -17,25 +17,21 @@ def parse_args(args=None):
     Perform command-line argument parsing (other otherwise parse arguments with defaults). 
     To parse in an interative context (i.e. in notebook), add required arguments.
     These will go into args and will generate a list that can be passed in.
-    For example: 
-        parse_args('--type', 'rnn', ...)
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('--task',           required=False ,              choices=['train', 'test', 'both'],  help='Task to run') # change required back to true
+    parser.add_argument('--task',           required=False ,              choices=['train', 'test', 'both'],  help='Task to run')
     if args is None: 
         return parser.parse_args()      ## For calling through command line
     return parser.parse_args(args)      ## For calling through notebook.
 
-def train_classifier(model, train_inputs, train_labels): # is this the right approach??
+def train_classifier(model, train_inputs, train_labels):
     """
-    Train your classifier with one epoch
-
-    Returns:
-    loss? accuracy?
+    Train the classifier with one epoch
     """
-    # copied from hw3?
+    
     zipped = list(zip(train_inputs, train_labels))
     random.shuffle(zipped)
+    # Flip images so that model is slightly more robust
     inputs = np.array([tf.image.random_flip_left_right(tup[0]) for tup in zipped])
     labels = np.array([tup[1] for tup in zipped])
  
@@ -43,35 +39,18 @@ def train_classifier(model, train_inputs, train_labels): # is this the right app
         avg_loss, avg_acc = model.train(train_inputs, train_labels)
         print(f"Train epoch: {epoch} \t Loss:{avg_loss} \t Acc:{avg_acc}")
 
-    # total_loss = 0
-    # optimizer = tf.optimizers.Adam(model.learning_rate)
-    # '''Trains model and returns model statistics'''
-    # stats = []
-    # try:
-    #     for epoch in range(model.epochs):
-    #         stats += [model.train(captions, img_feats, pad_idx, batch_size=args.batch_size)]
-    #         if args.check_valid:
-    #             model.test(valid[0], valid[1], pad_idx, batch_size=args.batch_size)
-    # except KeyboardInterrupt as e:
-    #     if epoch > 1:
-    #         print("Key-value interruption. Trying to early-terminate. Interrupt again to not do that!")
-    #     else: 
-    #         raise e
-        
-    # return stats
-    # ^ TAKEN FROM HW5 - USE AS INSPIRATION
 
 def compile_model(model):
     '''Compiles model by reference based on arguments'''
-    # optimizer = tf.keras.optimizers.get(args.optimizer).__class__(learning_rate = args.lr)
     model.compile(
-        optimizer   = tf.keras.optimizers.Adam(learning_rate = 0.001), # play around with this
-        loss        = loss_function, # reduce mean?
-        metrics     = [acc_function] # not sure if cat crossentropy is what we want lol
+        optimizer   = tf.keras.optimizers.Adam(learning_rate = 0.001), 
+        loss        = loss_function,
+        metrics     = [acc_function]
     )
 
 def test_model(model, test_inputs, test_labels):
-    '''Tests model and returns model statistics'''
+    '''Tests model and returns model statistics
+    Returns: loss and accuracy metrics'''
     loss, accuracy = model.test(test_inputs, test_labels)
     return loss, accuracy
 
@@ -88,10 +67,7 @@ def load_model(model_path):
     compile_model(loaded_model)
     return loaded_model
 
-
-#to visualize, set up a dictionary for all of the generated labels, pull from that
-# remember reverse one-hot encoding from hw 2?
-# stolen from hw3
+# Stolen from hw3
 def visualize_results(image_inputs, probabilities, image_labels, first_label, second_label):
     """
     Uses Matplotlib to visualize the correct and incorrect results of our model.
@@ -144,9 +120,7 @@ def visualize_results(image_inputs, probabilities, image_labels, first_label, se
     plt.show()
 
 def visualize_inputs(train_images, train_labels, label_names):
-
     #plt.figure(figsize=(10, 10))
-
     pass
 
 def show_incorrect_predictions(prediction, test_labels):
@@ -168,8 +142,7 @@ def main(args):
     imgs, pils, labels = preprocess(train_dir)
     train_images, train_labels, test_images, test_labels = split_train_test(input_images=imgs, input_labels=labels)
     
-    
-    visualize_inputs(train_images=train_images, train_labels=train_labels, label_names=label_name)
+    # visualize_inputs(train_images=train_images, train_labels=train_labels, label_names=label_name)
     
     asl_model = model()
     compile_model(asl_model)
@@ -177,13 +150,10 @@ def main(args):
     
     test_loss, test_accuracy = test_model(model=asl_model, test_inputs=test_images, test_labels=test_labels)
     print(f"Testing loss: {test_loss}, \t Testing acc: {test_accuracy}")
-    # run_real_time(asl_model, label_name)
-    run_rt(asl_model, label_name)
+    # Uncomment the line below if you want to try the contour-based hand detection
+    # run_contour_real_time(asl_model, label_name)
+    run_hd_real_time(asl_model, label_name)
 
-    # prediction = asl_model.predict(test_images[:])
-    # save_model(asl_model)
-    # show_incorrect_predictions(prediction=prediction, test_labels=test_labels)
-    # visualize_results(test_images[0:50], asl_model.call(test_images), test_labels[0:50], 4, 1)
     pass
 
 if __name__ == '__main__':
