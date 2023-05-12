@@ -46,7 +46,7 @@ class ASLClassifier(tf.keras.Model):
             self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
 
             ## Compute and report on aggregated statistics
-            total_loss.append(loss) # do we actually want total loss? maybe avg loss? also want acc
+            total_loss.append(loss)
             total_acc.append(acc)
 
         return tf.reduce_mean(total_loss), tf.reduce_mean(total_acc)
