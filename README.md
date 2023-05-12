@@ -14,4 +14,4 @@
 
 **Running the project**
 
-- To run the model, open the `assignment.py` file in VSCode and clicking the play button at the top. This will train and test the model, as well as start the real-time classifier.
+- To run the model, open the `assignment.py` file in VSCode and click the play button at the top. This will train and test the model, as well as start the real-time classifier.
